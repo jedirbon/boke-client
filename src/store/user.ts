@@ -24,6 +24,7 @@ export interface UserInfo {
   avatar?: string
   roleId: string
   UserConfModel: UserConfModel
+  CreatedAt: string
 }
 
 export interface UserState {
@@ -43,21 +44,13 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
-    // 登录
-    async login() {
-
+    //save token
+    saveToken(token: string) {
+      this.token = token
     },
-
-    // 登出
-    logout() {
-        
-    },
-
     // 更新用户信息
-    updateUserInfo(userInfo: Partial<UserInfo>) {
-      if (this.userInfo) {
-        this.userInfo = { ...this.userInfo, ...userInfo }
-      }
+    saveUserInfo(userInfo: Partial<UserInfo>) {
+        this.userInfo = userInfo as UserInfo
     },
   },
 

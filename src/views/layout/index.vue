@@ -2,15 +2,7 @@
   <div class="layout">
     <Head />
     <div class="main-content">
-      <!-- 主要内容区域 -->
-      <div class="content">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">
-          欢迎使用应用
-        </h1>
-        <p class="text-center text-gray-600">
-          这是一个撑满整个屏幕的布局示例
-        </p>
-      </div>
+      <router-view />
     </div>
   </div>
 </template>

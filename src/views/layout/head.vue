@@ -17,18 +17,21 @@
                     <el-dropdown-menu @click="handleDropdownClick('logout')">
                         <el-dropdown-item>退出</el-dropdown-item>
                     </el-dropdown-menu>
+                    <el-dropdown-menu @click="handleDropdownClick('login')">
+                        <el-dropdown-item>登录</el-dropdown-item>
+                    </el-dropdown-menu>
                 </template>
             </el-dropdown>
             <span class="username">{{ userStore.username }}</span>
         </div>
     </div>
+    <Login v-model="loginVisible" />
 </template>
-
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useUserStore } from '@/store/modules';
 import { useRouter } from 'vue-router';
-
+import Login from '@/views/login/login.vue'
 const router = useRouter()
 
 const userStore = useUserStore();
@@ -55,12 +58,14 @@ const activeMenu = ref("首页")
 const handleMenuClick = (item: any) => {
     activeMenu.value = item.name
 }
-
+const loginVisible = ref(false)
 const handleDropdownClick = (type: string) => {
     if (type === 'userCenter') {
         router.push('/userCenter')
     } else if (type === 'logout') {
         router.push('/login')
+    } else if (type === 'login') {
+        loginVisible.value = true
     }
 }
 </script>
