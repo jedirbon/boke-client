@@ -1,5 +1,6 @@
 import axios from 'axios'
-
+import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/store/user'
 // 调试：打印环境变量
 console.log('VITE_BASE_URL:', import.meta.env.VITE_BASE_URL)
 
@@ -10,8 +11,10 @@ const instance = axios.create({
 })
 
 instance.interceptors.request.use(config => {
-    // 调试：打印实际请求URL和请求头
-    if (config.baseURL && config.url) {
+    const userStore = useUserStore()
+    const token = userStore.getToken
+    if(token) {
+        config.headers.Authorization = `Bearer ${token}`
     }
     return config
 }, error => {
@@ -21,7 +24,19 @@ instance.interceptors.request.use(config => {
 
 instance.interceptors.response.use(res => {
     // 检查响应格式
-    return res.data
+    const {code, msg} = res.data
+    switch(code) {
+        case 200:
+            return res.data
+        case 401:
+            ElMessage.error(msg)
+            return msg
+        case 400:
+            ElMessage.error(msg)
+            return msg
+        default:
+            return res.data
+    }
 }, error => {
    return error
 })

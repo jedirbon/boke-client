@@ -41,6 +41,8 @@ export const useUserStore = defineStore('user', {
   getters: {
     // 获取用户名
     username: (state) => state.userInfo?.username || '游客',
+    //获取token
+    getToken:(state) => state.token
   },
 
   actions: {

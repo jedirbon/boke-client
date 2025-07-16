@@ -1,17 +1,17 @@
 <template>
     <el-dialog v-model="visible" @close="close">
-        <el-form :model="form" label-width="100px">
+        <el-form :model="formData" label-width="100px">
             <el-form-item label="昵称">
-                <el-input v-model="form.nickname" />
+                <el-input v-model="formData.nickname" />
             </el-form-item>
             <el-form-item label="邮箱">
-                <el-input v-model="form.email" />
+                <el-input v-model="formData.email" />
             </el-form-item>
             <el-form-item label="简介">
-                <el-input v-model="form.abstract" />
+                <el-input v-model="formData.abstract" />
             </el-form-item>
             <el-form-item label="头像">
-                <AvatarUpload v-model="form.avatar" 
+                <AvatarUpload v-model="formData.avatar" 
                 :action="uploadAction"
                 @success="handleUploadSuccess"
                 @error="handleUploadError" />    
@@ -24,25 +24,26 @@
     </el-dialog>
 </template>
 <script setup lang="ts">
+import { uploadUserApi } from '@/api/user'
 import AvatarUpload from '@/components/AvatarUpload.vue'
+import type { UserInfo } from '@/store/user'
 import { ref, watch } from 'vue'
 const uploadAction = ref('http://localhost:8080/api/upload')
 const visible = ref(false)
-const form = ref({
-    nickname: '',
-    email: '',
-    abstract: '',   //简介
-    avatar: '', 
-})
+
+const props = defineProps<{
+    formData:UserInfo
+}>()
 
 const handleUploadSuccess = (res: any) => {
-    form.value.avatar = res.data.url
+    props.formData.avatar = res.data.url
 }
 const handleUploadError = (err: any) => {
     console.log(err)
 }
-const handleSubmit = () => {
-    console.log(form.value)
+const handleSubmit = async () => {
+    const res = await uploadUserApi(props.formData)
+    console.log(res)
 }
 const close = () => {
     visible.value = false

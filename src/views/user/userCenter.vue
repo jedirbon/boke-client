@@ -29,12 +29,13 @@
 </template>
 <script setup lang="ts">
 import { useUserStore } from '@/store/user'
+import type { UserInfo } from '@/store/user'
 import { computed, ref } from 'vue';
 import EditUser from './editUser.vue'
 import dayjs from 'dayjs'
 import avatar from '@/assets/img/default-avatar.jpg'
-const userStroe = useUserStore()
-const userInfo = computed(() => userStroe.userInfo)
+const userStore = useUserStore()
+const userInfo = computed<UserInfo>(() => userStore.userInfo!)
 
 const visible = ref(false)
 const handleEdit = () => {
