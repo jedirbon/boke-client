@@ -12,4 +12,6 @@ export const uploadUserApi = (data:any) => {
     return http.put('/api/user/upload', data)
 }
 
-
+export const getUserDetailsApi = () => {
+    return http.get('/api/user/details')
+}

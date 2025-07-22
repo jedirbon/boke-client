@@ -12,8 +12,11 @@
             </el-form-item>
             <el-form-item label="头像">
                 <AvatarUpload v-model="formData.avatar" 
+                :url="formData.avatar"
                 :action="uploadAction"
-                @success="handleUploadSuccess"
+                :auto-upload="false"
+                :limit="1"
+                @change="handleChange"
                 @error="handleUploadError" />    
             </el-form-item>
         </el-form>
@@ -26,24 +29,37 @@
 <script setup lang="ts">
 import { uploadUserApi } from '@/api/user'
 import AvatarUpload from '@/components/AvatarUpload.vue'
-import type { UserInfo } from '@/store/user'
+import { ObjToFormData } from '@/utils/global'
+import { ElMessage } from 'element-plus'
 import { ref, watch } from 'vue'
+import { useUserStore } from '@/store/user'
+const userStore = useUserStore()
 const uploadAction = ref('http://localhost:8080/api/upload')
 const visible = ref(false)
 
 const props = defineProps<{
-    formData:UserInfo
+    formData:any
 }>()
 
-const handleUploadSuccess = (res: any) => {
-    props.formData.avatar = res.data.url
+const handleChange = (file:File) => {
+    props.formData.file = file
 }
 const handleUploadError = (err: any) => {
     console.log(err)
 }
 const handleSubmit = async () => {
-    const res = await uploadUserApi(props.formData)
+    const form = ObjToFormData(props.formData)
+    form.forEach((value:any, key:any) => {
+        console.log(value, key)
+    })
+    const res:any = await uploadUserApi(form)
     console.log(res)
+    if(res.code === 200){
+        ElMessage.success('修改成功')
+        visible.value = false
+        modelValue.value = false
+        userStore.saveUserInfo(res.data)
+    }
 }
 const close = () => {
     visible.value = false

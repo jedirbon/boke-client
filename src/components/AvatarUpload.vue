@@ -1,12 +1,17 @@
 <template>
   <div class="avatar-upload">
     <el-upload
+      ref="uploadRef"
       :action="action"
       :show-file-list="false"
       :before-upload="beforeUpload"
       :on-success="handleSuccess"
       :on-error="handleError"
       :headers="headers"
+      :auto-upload="autoUpload"
+      :on-change="handleChange"
+      :on-exceed="handleExceed"
+      :limit="limit"
       accept="image/*"
       class="avatar-uploader"
     >
@@ -39,9 +44,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, computed, watch, onUnmounted } from 'vue'
+import { ElMessage, genFileId, type UploadRawFile } from 'element-plus'
 import { User, Plus } from '@element-plus/icons-vue'
+import { FormatUrl } from '@/utils/global'
 
 interface Props {
   url?: string
@@ -49,12 +55,15 @@ interface Props {
   headers?: Record<string, string>
   maxSize?: number // 文件大小限制，单位MB
   acceptTypes?: string[] // 接受的文件类型
+  autoUpload?: boolean // 是否自动上传
+  limit?: number // 限制上传数量
 }
 
 interface Emits {
   (e: 'update:url', value: string): void
   (e: 'success', response: any): void
   (e: 'error', error: any): void
+  (e: 'change', file: File): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -67,11 +76,12 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<Emits>()
 
 // 头像URL
-const avatarUrl = ref(props.url)
+const avatarUrl = ref(FormatUrl(props.url))
+const uploadRef = ref()
 
 // 监听url变化
 watch(() => props.url, (newUrl) => {
-  avatarUrl.value = newUrl
+  avatarUrl.value = FormatUrl(newUrl)
 })
 
 // 上传前验证
@@ -91,7 +101,19 @@ const beforeUpload = (file: File) => {
   
   return true
 }
-
+const handleChange = (file:File) => {
+  if(!props.autoUpload) {
+    console.log(file)
+    avatarUrl.value = URL.createObjectURL(file.raw)
+    emit('change', file.raw)
+  }
+}
+const handleExceed = (files:File[]) => {
+    uploadRef.value.clearFiles()
+    const file = files[0] as UploadRawFile
+    file.uid = genFileId()
+    uploadRef.value!.handleStart(file)
+}
 // 上传成功回调
 const handleSuccess = (response: any, file: File) => {
   console.log('上传成功:', response)
@@ -125,6 +147,10 @@ const handleError = (error: any, file: File) => {
   emit('error', error)
   ElMessage.error('头像上传失败，请重试！')
 }
+
+onUnmounted(() => {
+  uploadRef.value.clearFiles()
+})
 </script>
 
 <style scoped lang="less">

@@ -1,3 +1,4 @@
+import { getUserDetailsApi } from '@/api/user'
 import { defineStore } from 'pinia'
 
 export interface UserConfModel {
@@ -21,20 +22,35 @@ export interface UserInfo {
   registerSource: string
   create: string
   email: string
-  avatar?: string
+  avatar: string
   roleId: string
-  UserConfModel: UserConfModel
   CreatedAt: string
+}
+export interface ResponseData {
+  code: number
+  data: any
+  message: string
 }
 
 export interface UserState {
-  userInfo: UserInfo | null
+  userInfo: UserInfo
   token: string
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
-    userInfo: null,
+    userInfo: {
+      id: 0,
+      username: '',
+      nickname: '',
+      abstract: '',
+      registerSource: '',
+      create: '',
+      email: '',
+      avatar: '',
+      roleId: '',
+      CreatedAt: ''
+    },
     token: ''
   }),
 
@@ -46,6 +62,14 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
+    //get Details
+    async getUserDetails(){
+      const res:any = await getUserDetailsApi()
+      if(res.code === 200){
+        this.userInfo = res.data
+        this.saveUserInfo(res.data)
+      }
+    },
     //save token
     saveToken(token: string) {
       this.token = token

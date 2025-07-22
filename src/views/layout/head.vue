@@ -39,17 +39,17 @@ const userStore = useUserStore();
 const menuList = ref([
     {
         name: '首页',
-        path: '/',
+        path: '/home',
         icon: 'HomeFilled'
     },
     {
         name: '订阅',
-        path: '/',
-        icon: ''
+        path: '/subscribe',
+        icon: 'Subscription'
     },
     {
         name: '收藏',
-        path: '/',
+        path: '/collect',
         icon: 'forck'
     }
 ])
@@ -57,6 +57,7 @@ const menuList = ref([
 const activeMenu = ref("首页")
 const handleMenuClick = (item: any) => {
     activeMenu.value = item.name
+    router.push(item.path)
 }
 const loginVisible = ref(false)
 const handleDropdownClick = (type: string) => {
